@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 import { StatusCode } from "../utils/statusCodes";
 import { Request, Response, NextFunction } from "express";
+import sendEmailVerification from "../utils/emailVerification";
 
 const prisma = new PrismaClient();
 
@@ -14,7 +15,7 @@ export class UserController {
     try {
       const { name, email, password, password_confirmation } = req.body;
 
-      if (!name || !email || !password || password_confirmation) {
+      if (!name || !email || !password || !password_confirmation) {
         res.status(StatusCode.BAD_REQUEST).json({
           status: "failed",
           msg: "All fields are required!",
@@ -53,12 +54,15 @@ export class UserController {
         },
       });
 
+      await sendEmailVerification(req, newUser);
+
       res.status(StatusCode.OK).json({
         status: "success",
         msg: "Registration success!",
         newUser: {
           id: newUser.id,
           email: newUser.email,
+          created_at: newUser.created_at,
         },
       });
     } catch (e) {

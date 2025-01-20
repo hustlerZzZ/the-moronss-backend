@@ -49,5 +49,5 @@ app.all("*", (req, res) => {
 
 // listen
 app.listen(PORT, () => {
-  console.log("Server is running successfully");
+  console.log(`Listening on port ${PORT}`);
 });
